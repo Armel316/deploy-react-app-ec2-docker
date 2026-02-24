@@ -24,7 +24,7 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
-      - run: npm test -- --watchAll=false
+      - run: CI=true react-scripts test --watchAll=false
 
   build-and-push:
     needs: test
