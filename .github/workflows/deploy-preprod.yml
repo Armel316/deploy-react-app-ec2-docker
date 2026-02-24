@@ -26,8 +26,6 @@ jobs:
           username: ${{ secrets.PREPROD_SSH_USER }}
           key: ${{ secrets.PREPROD_SSH_KEY }}
           script: |
-            cd /opt/react-app
-
             export IMAGE_NAME=ghcr.io/${{ github.repository }}
             export IMAGE_TAG=dev
 
