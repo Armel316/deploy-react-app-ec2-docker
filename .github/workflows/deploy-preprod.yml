@@ -23,7 +23,7 @@ jobs:
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.PREPROD_HOST }}
-          username: ${{ secrets.PREPROD_USER }}
+          username: ${{ secrets.PREPROD_SSH_USER }}
           key: ${{ secrets.PREPROD_SSH_KEY }}
           script: |
             cd /opt/react-app
