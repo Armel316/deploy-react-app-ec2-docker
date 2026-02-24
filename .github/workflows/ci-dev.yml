@@ -15,8 +15,6 @@ env:
 jobs:
   test:
     runs-on: ubuntu-latest
-    env:
-      CI: true
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -24,7 +22,7 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
-      - run: CI=true react-scripts test --watchAll=false
+      - run: npm test -- --watchAll=false
 
   build-and-push:
     needs: test
