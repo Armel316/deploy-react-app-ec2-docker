@@ -3,7 +3,9 @@ import ReactDOM from 'react-dom';
 import App from './App';
 import axios from 'axios';
 
-jest.mock('axios');
+jest.mock('axios', () => ({
+  get: jest.fn()
+}));
 
 it('renders without crashing', async () => {
   axios.get.mockResolvedValue({
