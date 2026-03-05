@@ -32,10 +32,10 @@ jobs:
             git clone https://github.com/${{ github.repository }} /opt/app/react-app
             cd /opt/app/react-app
 
-            # Convert repo name to lowercase
+            git fetch --tags
+
             REPO_LOWER=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
 
-            # Get latest git tag
             TAG=$(git describe --tags --abbrev=0)
             TAG=${TAG#v}
 
@@ -45,7 +45,6 @@ jobs:
             export APP_PORT=8080
 
             echo "${{ secrets.REGISTRY_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-
             docker network create devops-network || true
             docker-compose -f docker-compose.deploy.yml down || true
             docker compose -f docker-compose.deploy.yml pull
