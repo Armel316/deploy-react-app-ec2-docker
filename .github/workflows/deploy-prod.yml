@@ -28,15 +28,15 @@ jobs:
           script: |
             sudo mkdir -p /opt/app
             sudo chown -R $USER:$USER /opt/app
-            rm -rf /opt/app/react-app
-            git clone https://github.com/${{ github.repository }} /opt/app/react-app
-            cd /opt/app/react-app
 
-            git fetch --tags
+            rm -rf /opt/app/react-app
+            git clone --tags https://github.com/${{ github.repository }} /opt/app/react-app
+
+            cd /opt/app/react-app
 
             REPO_LOWER=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
 
-            TAG=$(git describe --tags --abbrev=0)
+            TAG=$(git describe --tags --abbrev=0 || echo "latest")
             TAG=${TAG#v}
 
             export REGISTRY=ghcr.io
@@ -45,7 +45,9 @@ jobs:
             export APP_PORT=8080
 
             echo "${{ secrets.REGISTRY_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-            docker network create devops-network || true
+
+            docker network inspect devops-network >/dev/null 2>&1 || docker network create devops-network
+
             docker-compose -f docker-compose.deploy.yml down || true
             docker compose -f docker-compose.deploy.yml pull
             docker compose -f docker-compose.deploy.yml up -d --remove-orphans
