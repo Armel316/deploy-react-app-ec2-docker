@@ -32,12 +32,14 @@ jobs:
             git clone https://github.com/${{ github.repository }} /opt/app/react-app
             cd /opt/app/react-app
 
+            REPO_LOWER=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+
             export REGISTRY=ghcr.io
-            export IMAGE_NAME=ghcr.io/${{ github.repository }}
+            export IMAGE_NAME=$REPO_LOWER
             export IMAGE_TAG=dev
             export APP_PORT=8080
 
             echo "${{ secrets.REGISTRY_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-
+            docker network create devops-network || true
             docker-compose -f docker-compose.deploy.yml pull
             docker-compose -f docker-compose.deploy.yml up -d --remove-orphans
