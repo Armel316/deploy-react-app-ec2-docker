@@ -1,0 +1,52 @@
+name: Deploy Production
+
+on:
+  workflow_run:
+    workflows: ["Release"]
+    types:
+      - completed
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  deploy:
+    if: >
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_branch == 'main'
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Deploy to Production
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.PROD_HOST }}
+          username: ${{ secrets.PROD_SSH_USER }}
+          key: ${{ secrets.PROD_SSH_KEY }}
+          script: |
+            sudo mkdir -p /opt/app
+            sudo chown -R $USER:$USER /opt/app
+            rm -rf /opt/app/react-app
+            git clone https://github.com/${{ github.repository }} /opt/app/react-app
+            cd /opt/app/react-app
+
+            # Convert repo name to lowercase
+            REPO_LOWER=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+
+            # Get latest git tag
+            TAG=$(git describe --tags --abbrev=0)
+            TAG=${TAG#v}
+
+            export REGISTRY=ghcr.io
+            export IMAGE_NAME=$REPO_LOWER
+            export IMAGE_TAG=$TAG
+            export APP_PORT=8080
+
+            echo "${{ secrets.REGISTRY_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+            docker network create devops-network || true
+            docker-compose -f docker-compose.deploy.yml down || true
+            docker compose -f docker-compose.deploy.yml pull
+            docker compose -f docker-compose.deploy.yml up -d --remove-orphans
