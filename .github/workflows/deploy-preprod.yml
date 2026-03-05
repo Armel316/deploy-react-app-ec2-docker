@@ -41,5 +41,6 @@ jobs:
 
             echo "${{ secrets.REGISTRY_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             docker network create devops-network || true
+            docker-compose -f docker-compose.deploy.yml down || true
             docker-compose -f docker-compose.deploy.yml pull
             docker-compose -f docker-compose.deploy.yml up -d --remove-orphans
