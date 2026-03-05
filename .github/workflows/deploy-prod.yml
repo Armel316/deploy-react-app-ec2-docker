@@ -31,9 +31,11 @@ jobs:
             rm -rf /opt/app/react-app
             git clone https://github.com/${{ github.repository }} /opt/app/react-app
             cd /opt/app/react-app
-            
+
+            export REGISTRY=ghcr.io
             export IMAGE_NAME=ghcr.io/${{ github.repository }}
             export IMAGE_TAG=latest
+            export APP_PORT=8080
 
             echo "${{ secrets.REGISTRY_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
