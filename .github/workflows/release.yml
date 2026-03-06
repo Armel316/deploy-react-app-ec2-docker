@@ -65,9 +65,9 @@ jobs:
           git tag v${{ steps.bump.outputs.version }}
           git push origin v${{ steps.bump.outputs.version }}
 
-  # --------------------
+  # ---------------------
   # 3️⃣ BUILD + SCAN + PUSH
-  # --------------------
+  # ---------------------
   build-and-push:
     needs: version
     runs-on: ubuntu-latest
